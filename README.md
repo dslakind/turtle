@@ -4,7 +4,7 @@ This repository is intended to create a library for Java that is similar in scop
 
 ## Status
 
-Early development — project scaffolding is in place; core `Turtle` API is not yet implemented. See [PLAN.md](PLAN.md) for the roadmap.
+Early development — project scaffolding is in place; core `Turtle` API is not yet implemented. See [PLAN.md](PLAN.md) for the roadmap and [docs/design.md](docs/design.md) for the class diagram.
 
 ## Requirements
 

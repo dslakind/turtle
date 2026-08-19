@@ -13,6 +13,10 @@ A Java library that replicates the core motion & drawing behavior of Python's [`
 | Base package | `turtle` |
 | API scope (v1) | Core motion & drawing only (movement, heading, pen up/down, color, speed) |
 | Version control | Git, initialized locally |
+| Turtle mutability | Mutable with getters (`getPosition`, `getHeading`, `getPen`, `getSegments`) |
+| Angle units | Degrees externally; converted to radians internally only for trig |
+| Heading convention | 0° = east, increases counter-clockwise, normalised to `[0, 360)` |
+| Segment list access | `getSegments()` returns an unmodifiable view |
 
 Out of scope for v1 (candidates for later epics): screen/window configuration (bgcolor, title, size), shapes/stamps, event handlers (onclick/onkey), multiple simultaneous turtles, undo/clone, text/write().
 
@@ -50,17 +54,17 @@ Since there's no team to coordinate, we'll keep the ceremony lightweight but sti
 **Goal:** A `Turtle` class that tracks position/heading/pen state as plain data + logic, fully unit-testable without opening any window. This mirrors the Python turtle's internal state machine.
 
 Candidate stories (map to Python turtle methods):
-- [ ] **Story 1.1** — Turtle starts at origin `(0,0)` facing heading `0` (east), pen down, default color/width.
-- [ ] **Story 1.2** — `forward(distance)` / `backward(distance)` update position based on heading.
-- [ ] **Story 1.3** — `right(angle)` / `left(angle)` update heading (with proper wraparound at 360°).
-- [ ] **Story 1.4** — `penUp()` / `penDown()` toggle whether movement draws a line.
-- [ ] **Story 1.5** — `goTo(x, y)` / `setHeading(angle)` teleport-style updates.
-- [ ] **Story 1.6** — Track a **path/history** of line segments drawn (for later rendering) — e.g. a list of `(from, to, color, width)` segments, only recorded when pen is down.
-- [ ] **Story 1.7** — `home()` resets to origin/heading 0 (without necessarily clearing drawing, matching Python semantics — confirm from docs).
+- [x] **Story 1.1** — Turtle starts at origin `(0,0)` facing heading `0` (east), pen down, default color/width.
+- [x] **Story 1.2** — `forward(distance)` / `backward(distance)` update position based on heading.
+- [x] **Story 1.3** — `right(angle)` / `left(angle)` update heading (with proper wraparound at 360°).
+- [x] **Story 1.4** — `penUp()` / `penDown()` toggle whether movement draws a line.
+- [x] **Story 1.5** — `goTo(x, y)` / `setHeading(angle)` teleport-style updates.
+- [x] **Story 1.6** — Track a **path/history** of line segments drawn (for later rendering) — e.g. a list of `(from, to, color, width)` segments, only recorded when pen is down.
+- [x] **Story 1.7** — `home()` resets to origin/heading 0 (without necessarily clearing drawing, matching Python semantics — confirm from docs).
 
 **Acceptance criteria:** Each story has JUnit tests covering normal cases + edge cases (e.g., negative distance, angle > 360, angle < 0). No AWT/Swing classes involved yet.
 
-**Design discussion points to have before coding:** Should `Turtle` be mutable with getters, or expose immutable snapshots? How do we represent angle units (Python defaults to degrees but supports radians mode)?
+**Design decisions made:** `Turtle` is mutable with getters. Angles are degrees (matching Python default); radians mode is out of scope for v1. `forward(0)` is a no-op — distance == 0 returns early before any segment is recorded.
 
 ---
 
