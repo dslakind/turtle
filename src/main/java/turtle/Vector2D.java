@@ -2,6 +2,7 @@ package turtle;
 
 import java.util.Objects;
 
+/** Immutable 2D point; all operations return new instances. */
 public class Vector2D {
     private final double x;
     private final double y;
@@ -11,6 +12,7 @@ public class Vector2D {
         y = initY;
     }
 
+    /** Returns the vector sum as a new instance. */
     public Vector2D add(Vector2D other) {
         double resultX = this.x + other.x;
         double resultY = this.y + other.y;
@@ -18,6 +20,7 @@ public class Vector2D {
         return new Vector2D(resultX, resultY);
     }
 
+    /** Returns the Euclidean distance between this point and {@code other}. */
     public double distanceTo(Vector2D other) {
         double dx = this.x - other.x;
         double dy = this.y - other.y;

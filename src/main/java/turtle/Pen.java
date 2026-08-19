@@ -3,6 +3,7 @@ package turtle;
 import java.awt.Color;
 import java.util.Objects;
 
+/** Mutable pen state: whether it draws, its color, and its stroke width. */
 public class Pen {
     private boolean isDown;
     private Color color;
@@ -14,6 +15,7 @@ public class Pen {
         width = initWidth;
     }
     
+    /** Defaults: pen down, black, width 1.0 — matches Python turtle defaults. */
     public Pen() {
         this(true, Color.BLACK, 1);
     }
@@ -42,6 +44,7 @@ public class Pen {
         this.color = color;
     }
 
+    /** @throws IllegalArgumentException if width is zero or negative */
     public void setWidth(double width) {
         if (width <= 0) {
             throw new IllegalArgumentException("Width must be positive:" + width);

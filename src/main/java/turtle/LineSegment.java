@@ -3,12 +3,17 @@ package turtle;
 import java.awt.Color;
 import java.util.Objects;
 
+/** Immutable record of a drawn stroke; captures pen color and width at the time of drawing. */
 public class LineSegment {
     private final Vector2D from;
     private final Vector2D to;
     private final Color color;
     private final double width;
 
+    /**
+     * @throws NullPointerException if from, to, or color is null
+     * @throws IllegalArgumentException if width is zero or negative
+     */
     public LineSegment(
         Vector2D initFrom, 
         Vector2D initTo,
