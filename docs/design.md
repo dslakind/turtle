@@ -1,6 +1,6 @@
 # Design — v1 Class Diagram
 
-Essential classes for Epic 1 (headless core model). `Screen` rendering comes in Epic 2.
+Epic 1 classes are implemented. `Screen` (Epic 2) is designed but not yet implemented.
 
 ```mermaid
 classDiagram
@@ -55,14 +55,24 @@ classDiagram
         +getWidth() double
     }
     class Screen {
-        +render(Turtle)
+        -Turtle turtle
+        -TurtleCanvas canvas
+        +Screen(turtle)
+        +show()
+    }
+    class TurtleCanvas {
+        -Turtle turtle
+        +TurtleCanvas(turtle)
+        +paintComponent(Graphics g)
     }
 
     Turtle "1" *-- "1" Pen : has
     Turtle "1" *-- "*" LineSegment : records
     Turtle ..> Vector2D : uses
     LineSegment "1" *-- "2" Vector2D : from/to
-    Screen ..> Turtle : reads segments from
+    Screen "1" o-- "1" Turtle : renders live
+    Screen "1" *-- "1" TurtleCanvas : owns
+    TurtleCanvas "1" o-- "1" Turtle : reads segments
 ```
 
 ## Notes / Decisions
@@ -77,3 +87,5 @@ classDiagram
 - `forward(0)` is a no-op — returns early before computing position or recording a segment.
 - `forward` delegates to a private `goTo(Vector2D)` overload; the public `goTo(double, double)` also delegates to it. All movement and segment-recording logic lives in one place.
 - `Screen` (Epic 2) is a pure renderer: it reads a `Turtle`'s recorded `LineSegment`s and paints them; it does not own turtle state.
+- `Screen` holds a **live `Turtle` reference** (constructor: `Screen(Turtle)`). `paintComponent` calls `turtle.getSegments()` on each repaint — no snapshot is passed by the caller. Rationale: keeps the API minimal, matches Python turtle's live screen model, and allows Epic 4 animation via a timer + `repaint()` with no API change. A snapshot approach would require callers to re-pass segments on every update with no benefit at this scale.
+- `TurtleCanvas extends JPanel` is package-private and owned by `Screen`. It overrides `paintComponent` to iterate `turtle.getSegments()` and draw each via `Graphics2D`. It also owns the coordinate transform (Story 2.3): turtle Cartesian (origin = centre, y-up) → Swing pixel (origin = top-left, y-down).
