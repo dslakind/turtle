@@ -34,18 +34,22 @@ public class LineSegment {
         width = initWidth;
     }
 
+    /** Returns the segment's starting point. */
     public Vector2D getFrom() {
         return from;
     }
 
+    /** Returns the segment's ending point. */
     public Vector2D getTo() {
         return to;
     }
 
+    /** Returns the color captured when the segment was recorded. */
     public Color getColor() {
         return color;
     }
 
+    /** Returns the stroke width captured when the segment was recorded. */
     public double getWidth() {
         return width;
     }

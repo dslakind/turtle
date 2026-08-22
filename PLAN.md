@@ -110,11 +110,32 @@ All 7 stories completed; `mvn test` green with 19 passing tests.
 **Goal:** Visualize the recorded path from Epic 1 in a real window.
 
 - [x] **Story 2.1** — A `TurtleScreen`/`Window` class that opens a `JFrame` with a custom `JPanel` canvas.
-- [ ] **Story 2.2** — Canvas paints all recorded line segments from a `Turtle`'s history via `paintComponent`/`Graphics2D`.
-- [ ] **Story 2.3** — Coordinate system translation: turtle's Cartesian (0,0 = center, y-up) → Swing's pixel coords (0,0 = top-left, y-down).
-- [ ] **Story 2.4** — Manual demo/smoke test: draw a square, a triangle, a star — visually confirm correctness (not a unit test, a "does it look right" check).
+- [x] **Story 2.2** — Canvas paints all recorded line segments from a `Turtle`'s history via `paintComponent`/`Graphics2D`.
+- [x] **Story 2.3** — Coordinate system translation: turtle's Cartesian (0,0 = center, y-up) → Swing's pixel coords (0,0 = top-left, y-down).
+- [x] **Story 2.4** — Manual demo/smoke test: draw a square, a triangle, a star — visually confirm correctness (not a unit test, a "does it look right" check).
 
 **Acceptance criteria:** Running a small demo `main()` opens a window and draws a shape matching what the equivalent Python turtle script would produce.
+
+**Status:** ✅ Complete — 11 Swing tests are green, including frame construction, canvas ownership, coordinate mapping, color/width rendering, and pen-up exclusion. Full `mvn test` is passing.
+
+### Sprint 2 Review — Epic 2 (Rendering)
+
+**Demo:** A small `TurtleDemo` can create a turtle, walk a square or triangle, show the window, and confirm the drawing appears centered and correctly oriented with the y-axis flipped for Swing.
+
+**What went well:**
+- Keeping the rendering layer separate from the headless turtle model made the test strategy straightforward.
+- The live-reference design (`Screen` holds the same `Turtle` the canvas reads from) kept the API minimal and fits the eventual animation story.
+- Rendering tests based on `BufferedImage` pixels were a reliable way to validate line placement, colors, and width without relying on fragile visual assertions.
+- Isolating the coordinate transform inside `TurtleCanvas` kept the business logic independent from Swing details.
+
+**What was tricky:**
+- The most common bug was a wrong y-axis conversion: `Swing` uses y-down while the turtle model uses y-up, so the first fix often painted positive y in the wrong direction.
+- `Screen` originally tried to be a `JFrame` subclass, which caused recursive `show()`/`setVisible()` calls. Splitting the ownership model into `Screen` + inner `JFrame` resolved that cleanly.
+- Headless CI environments require GUI tests to skip themselves; Story 2.1/2.2/2.3 tests should be guarded with `GraphicsEnvironment.isHeadless()`.
+
+**What to change next sprint:**
+- Move to Epic 3 (Pen Styling) and add `Turtle` convenience methods for color and width forwarding.
+- Consider whether the screen should later support a `title()`, `bgcolor()`, or `setup(width, height)` API as part of a polish pass.
 
 ---
 
@@ -160,4 +181,16 @@ All 7 stories completed; `mvn test` green with 19 passing tests.
 4. You implement; I review, point out issues, suggest but don't write the bulk of the solution.
 5. We run tests, check the box, move to the next story.
 
-**Next step:** Start Epic 2 — Rendering. Epics 0 and 1 are complete. The headless model is fully implemented and tested. The design for `Screen` (a `JFrame`+`JPanel` that reads `Turtle.getSegments()` and paints via `Graphics2D`) is outlined in `docs/design.md`. `Screen` will hold a live `Turtle` reference — design decision recorded in the Decisions Log.
+**Next step:** Start Epic 3 — Pen Styling. Epics 0, 1, and 2 are complete. The headless model and Swing renderer are implemented and tested. The design for `Screen` (a `JFrame` + custom `JPanel` that reads `Turtle.getSegments()` and paints via `Graphics2D`) is captured in `docs/design.md`, and the live `Turtle` reference design is recorded in the Decisions Log.
+
+## Retrospective
+
+**What worked well:**
+- Breaking the work into headless model, then renderer, then coordinate mapping kept the test surface clean and reduced the chance of mixing concerns.
+- Pixel-based tests were effective for validating rendering without needing to inspect a real window manually.
+- Keeping `LineSegment` immutable and storing color/width at draw time made the painting logic deterministic and easy to test.
+
+**What we would improve next time:**
+- Add GUI tests with stricter EDT discipline from the start, rather than revisiting thread ownership after the fact.
+- Separate headless-safe unit tests from display-dependent tests more explicitly in the naming and assumptions.
+- Keep the design document and plan in sync as features land, instead of updating them as a follow-up step.

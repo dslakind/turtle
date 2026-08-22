@@ -73,20 +73,25 @@ public class Turtle {
         return degrees * Math.PI / 180;
     }
 
+    /** Returns the turtle's current position. */
     public Vector2D getPosition() {
         return position;
     }
 
+    /** Returns the turtle's current heading in degrees. */
     public double getHeading() {
         return heading;
     }
 
+    /** Returns the turtle's mutable pen state. */
     public Pen getPen() {
         return pen;
     }
 
+    /** Lifts the pen so subsequent movement does not record segments. */
     public void penUp() { pen.penUp(); }
 
+    /** Lowers the pen so subsequent movement records segments. */
     public void penDown() { pen.penDown(); }
 
     /** Returns an unmodifiable view of all segments recorded since construction. */

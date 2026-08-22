@@ -1,6 +1,6 @@
 # Design — v1 Class Diagram
 
-Epic 1 classes are implemented. `Screen` (Epic 2) is designed but not yet implemented.
+Epic 1 and Epic 2 classes are implemented and tested. The Swing rendering layer now owns a live turtle reference, a `JFrame`, and a custom drawing `JPanel`.
 
 ```mermaid
 classDiagram
@@ -57,8 +57,11 @@ classDiagram
     class Screen {
         -Turtle turtle
         -TurtleCanvas canvas
+        -JFrame frame
         +Screen(turtle)
         +show()
+        +getFrame() JFrame
+        +getCanvas() TurtleCanvas
     }
     class TurtleCanvas {
         -Turtle turtle
@@ -72,6 +75,7 @@ classDiagram
     LineSegment "1" *-- "2" Vector2D : from/to
     Screen "1" o-- "1" Turtle : renders live
     Screen "1" *-- "1" TurtleCanvas : owns
+    Screen "1" *-- "1" JFrame : contains
     TurtleCanvas "1" o-- "1" Turtle : reads segments
 ```
 
@@ -86,6 +90,22 @@ classDiagram
 - Heading convention: 0° = east, increases counter-clockwise (standard math / Python turtle).
 - `forward(0)` is a no-op — returns early before computing position or recording a segment.
 - `forward` delegates to a private `goTo(Vector2D)` overload; the public `goTo(double, double)` also delegates to it. All movement and segment-recording logic lives in one place.
-- `Screen` (Epic 2) is a pure renderer: it reads a `Turtle`'s recorded `LineSegment`s and paints them; it does not own turtle state.
-- `Screen` holds a **live `Turtle` reference** (constructor: `Screen(Turtle)`). `paintComponent` calls `turtle.getSegments()` on each repaint — no snapshot is passed by the caller. Rationale: keeps the API minimal, matches Python turtle's live screen model, and allows Epic 4 animation via a timer + `repaint()` with no API change. A snapshot approach would require callers to re-pass segments on every update with no benefit at this scale.
-- `TurtleCanvas extends JPanel` is package-private and owned by `Screen`. It overrides `paintComponent` to iterate `turtle.getSegments()` and draw each via `Graphics2D`. It also owns the coordinate transform (Story 2.3): turtle Cartesian (origin = centre, y-up) → Swing pixel (origin = top-left, y-down).
+- `Screen` is a façade around a Swing window: it owns a live `Turtle` reference, creates a `JFrame`, and adds a custom `TurtleCanvas` to the frame.
+- `Screen` is intentionally not a subclass of `JFrame`; it owns the frame as a separate object to avoid recursion and keep the API more explicit and testable.
+- `TurtleCanvas extends JPanel` and overrides `paintComponent` to iterate `turtle.getSegments()`. Each segment is painted using its stored `Color` and `width`.
+- The render loop intentionally reads the live turtle state on each repaint, which keeps the screen synchronized with the turtle and supports Epic 4 animation without changing the screen API.
+
+### Turtle coordinate system
+
+Turtle coordinates use a Cartesian coordinate system:
+
+- `(0, 0)` is the center of the canvas.
+- Positive x moves right.
+- Negative x moves left.
+- Positive y moves up.
+- Negative y moves down.
+- Turtle coordinates are converted to Swing pixel coordinates with:
+  `screenX = canvasWidth / 2 + turtleX`
+  `screenY = canvasHeight / 2 - turtleY`
+- The conversion uses the actual component dimensions, not only the preferred size.
+- This is the exact boundary for Story 2.3 and keeps the coordinate logic isolated in the canvas, not in the turtle model.

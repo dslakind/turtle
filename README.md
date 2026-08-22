@@ -4,7 +4,9 @@ This repository is intended to create a library for Java that is similar in scop
 
 ## Status
 
-**Epic 1 complete** — the headless core state model is implemented and fully unit-tested (15 tests, all passing). Epic 2 (Swing rendering) is next. See [PLAN.md](PLAN.md) for the roadmap and [docs/design.md](docs/design.md) for the class diagram.
+**Epic 2 complete** — the Swing rendering layer is implemented and tested. The project now includes a `Screen` window with a custom `TurtleCanvas`, live turtle-to-canvas rendering for recorded segments, and coordinate transformation from turtle space to Swing pixel space.
+
+See [PLAN.md](PLAN.md) for the roadmap and [docs/design.md](docs/design.md) for the class diagram.
 
 ## Usage
 
@@ -18,8 +20,11 @@ t.goTo(0, 0);                 // teleport — no segment recorded
 t.penDown();
 t.home();                     // return to origin and record segment
 
-List<LineSegment> segments = t.getSegments(); // read by Screen in Epic 2
+Screen screen = new Screen(t);
+screen.show();
 ```
+
+This opens a `JFrame` with a custom `TurtleCanvas` that paints each recorded `LineSegment` using its stored color and width.
 
 ## Requirements
 

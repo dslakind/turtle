@@ -9,6 +9,11 @@ public class Pen {
     private Color color;
     private double width;
     
+    /**
+     * Creates a pen with the supplied state, color, and stroke width.
+     *
+     * @throws IllegalArgumentException if {@code initWidth} is zero or negative
+     */
     public Pen(boolean isDown, Color initColor, double initWidth) {
         this.isDown = isDown;
         color = initColor;
@@ -20,26 +25,32 @@ public class Pen {
         this(true, Color.BLACK, 1);
     }
 
+    /** Lifts the pen so movement is not drawn. */
     public void penUp() {
         this.isDown = false;
     }
 
+    /** Lowers the pen so movement is drawn. */
     public void penDown() {
         this.isDown = true;
     }
 
+    /** Returns whether the pen currently draws movement. */
     public boolean isDown() {
         return isDown;
     }
 
+    /** Returns the current pen color. */
     public Color getColor() {
         return color;
     }
 
+    /** Returns the current stroke width. */
     public double getWidth() {
         return width;
     }
 
+    /** Sets the color used for subsequently recorded segments. */
     public void setColor(Color color) {
         this.color = color;
     }

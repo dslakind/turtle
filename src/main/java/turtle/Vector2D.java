@@ -7,6 +7,7 @@ public class Vector2D {
     private final double x;
     private final double y;
 
+    /** Creates an immutable point with the supplied Cartesian coordinates. */
     public Vector2D(double initX, double initY) {
         x = initX;
         y = initY;
@@ -27,10 +28,12 @@ public class Vector2D {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    /** Returns the x-coordinate. */
     public double getX() {
         return x;
     }
 
+    /** Returns the y-coordinate. */
     public double getY() {
         return y;
     }
