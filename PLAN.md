@@ -142,21 +142,50 @@ All 7 stories completed; `mvn test` green with 19 passing tests.
 ## Epic 3 — Pen Styling
 **Goal:** Match Python's pen customization API.
 
-- [ ] **Story 3.1** — `penColor(color)` on `Turtle` — support named colors and/or RGB. **Note:** `Pen.setColor(Color)` already exists; this story adds the `Turtle`-level forwarding method and a `String`-based color name API to match Python's `turtle.pencolor("red")` syntax.
-- [ ] **Story 3.2** — `penWidth(width)` on `Turtle`. **Note:** `Pen.setWidth(double)` (with positive-value validation) already exists; this story adds the `Turtle`-level forwarding method.
-- [ ] **Story 3.3** — `fillColor` + basic `beginFill()`/`endFill()` (stretch — may be its own epic if complex).
+- [x] **Story 3.1** — `penColor(color)` on `Turtle` — support named colors and/or RGB. **Note:** `Pen.setColor(Color)` already exists; this story adds the `Turtle`-level forwarding method and a `String`-based color name API to match Python's `turtle.pencolor("red")` syntax.
+- [x] **Story 3.2** — `penWidth(width)` on `Turtle`. **Note:** `Pen.setWidth(double)` (with positive-value validation) already exists; this story adds the `Turtle`-level forwarding method.
+
+**Status:** Complete for the current scope. `Turtle` exposes color and width convenience methods, and `LineSegment` captures both values when movement is recorded. Named color parsing remains a future API enhancement if needed.
+
+### Sprint 3 Review — Epic 3 (Pen Styling)
+
+**What went well:**
+- Keeping color and width state in `Pen` allowed the `Turtle` methods to remain small forwarding methods.
+- Capturing pen style in immutable `LineSegment` values preserved the appearance of earlier movement after later style changes.
+- Headless tests covered state changes, segment metadata, and validation without involving Swing.
+
+**What was tricky:**
+- A test initially inspected the first segment twice instead of checking the second segment after a color change.
+- Formatting cleanup was needed after adding the new tests and API comments.
+
+**What to change next sprint:**
+- Keep polygon fill state separate from `LineSegment`; filling needs ordered vertices, a fill color, and completion semantics.
+- Add the fill model and tests before adding any Swing polygon rendering.
 
 ---
 
-## Epic 4 — Animation / Speed
+## Epic 4 — Shape Filling
+**Goal:** Record and render filled polygons while keeping fill state in the headless model and coordinate conversion in the renderer.
+
+- [ ] **Story 4.1** — `fillColor(color)` stores a fill color separately from the pen color.
+- [ ] **Story 4.2** — `beginFill()` starts recording a polygon path from the current turtle position.
+- [ ] **Story 4.3** — `endFill()` completes the path and publishes a filled polygon; filling does not render before completion.
+- [ ] **Story 4.4** — Canvas renders completed polygons before their outlines, using the stored fill color.
+- [ ] **Story 4.5** — Filled polygon coordinate mapping and headless `BufferedImage` rendering tests.
+
+**Acceptance criteria:** A closed triangle or other polygon drawn between `beginFill()` and `endFill()` is rendered with the selected fill color, its outline remains visible, pen-up movement contributes to the fill path without creating a line segment, and incomplete or inactive fills do not create visible polygons. The model remains unit-testable without Swing.
+
+**Design boundary:** The model will expose immutable filled-polygon data containing ordered points and the fill color. The renderer will map each point with the existing turtle-to-Swing transform and draw completed polygons with `Graphics2D`. Nested fill calls and paths with fewer than three points must have explicit behavior in the implementation and tests.
+
+## Epic 5 — Animation / Speed
 **Goal:** Optional visual animation instead of instant line drawing, matching `speed()` in Python.
 
-- [ ] **Story 4.1** — `speed(level)` setting (0 = instant, 1-10 = slow-to-fast).
-- [ ] **Story 4.2** — Incremental redraw/timer-based animation of movement (this is the trickiest part — likely needs its own design discussion on threading with Swing's EDT).
+- [ ] **Story 5.1** — `speed(level)` setting (0 = instant, 1-10 = slow-to-fast).
+- [ ] **Story 5.2** — Incremental redraw/timer-based animation of movement (this is the trickiest part — likely needs its own design discussion on threading with Swing's EDT).
 
 ---
 
-## Epic 5 — Polish & Documentation
+## Epic 6 — Polish & Documentation
 - [ ] Javadoc pass on all public API
 - [ ] `README.md` with usage examples side-by-side with Python equivalents
 - [ ] Example programs (square, star, spiral) in `src/main/java` or a `examples`/`demo` module
@@ -181,7 +210,7 @@ All 7 stories completed; `mvn test` green with 19 passing tests.
 4. You implement; I review, point out issues, suggest but don't write the bulk of the solution.
 5. We run tests, check the box, move to the next story.
 
-**Next step:** Start Epic 3 — Pen Styling. Epics 0, 1, and 2 are complete. The headless model and Swing renderer are implemented and tested. The design for `Screen` (a `JFrame` + custom `JPanel` that reads `Turtle.getSegments()` and paints via `Graphics2D`) is captured in `docs/design.md`, and the live `Turtle` reference design is recorded in the Decisions Log.
+**Next step:** Start Epic 4 — Shape Filling. Epics 0, 1, 2, and 3 are complete for their current scopes. The headless model and Swing renderer are implemented and tested. The design for `Screen` (a `JFrame` + custom `JPanel` that reads `Turtle.getSegments()` and paints via `Graphics2D`) is captured in `docs/design.md`, and the live `Turtle` reference design is recorded in the Decisions Log.
 
 ## Retrospective
 

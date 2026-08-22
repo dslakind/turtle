@@ -1,6 +1,6 @@
 # Design — v1 Class Diagram
 
-Epic 1 and Epic 2 classes are implemented and tested. The Swing rendering layer now owns a live turtle reference, a `JFrame`, and a custom drawing `JPanel`.
+Epic 1 and Epic 2 classes are implemented and tested. Epic 3 adds pen styling. Epic 4 is planned as a separate shape-filling epic because it introduces polygon state and renderer behavior beyond individual line segments. The Swing rendering layer owns a live turtle reference, a `JFrame`, and a custom drawing `JPanel`.
 
 ```mermaid
 classDiagram
@@ -17,11 +17,17 @@ classDiagram
         +setHeading(angle)
         +penUp()
         +penDown()
+        +penColor(color)
+        +penWidth(width)
+        +fillColor(color)
+        +beginFill()
+        +endFill()
         +home()
         +getPosition() Vector2D
         +getHeading() double
         +getPen() Pen
         +getSegments() List~LineSegment~
+        +getFilledPolygons() List~FilledPolygon~
     }
     class Pen {
         -boolean isDown
@@ -54,6 +60,12 @@ classDiagram
         +getColor() Color
         +getWidth() double
     }
+    class FilledPolygon {
+        -List~Vector2D~ points
+        -Color color
+        +getPoints() List~Vector2D~
+        +getColor() Color
+    }
     class Screen {
         -Turtle turtle
         -TurtleCanvas canvas
@@ -71,8 +83,10 @@ classDiagram
 
     Turtle "1" *-- "1" Pen : has
     Turtle "1" *-- "*" LineSegment : records
+    Turtle "1" *-- "*" FilledPolygon : records
     Turtle ..> Vector2D : uses
     LineSegment "1" *-- "2" Vector2D : from/to
+    FilledPolygon "1" *-- "*" Vector2D : points
     Screen "1" o-- "1" Turtle : renders live
     Screen "1" *-- "1" TurtleCanvas : owns
     Screen "1" *-- "1" JFrame : contains
@@ -85,6 +99,9 @@ classDiagram
 - `Pen` is a separate object (not fields on `Turtle`) to mirror Python's `TPen` mixin and keep motion logic decoupled from drawing-style logic.
 - `Vector2D` is immutable — operations return new instances rather than mutating in place.
 - `LineSegment` is immutable — all fields are `final`; captures pen color and width at draw time.
+- Epic 4 will represent completed fills as immutable `FilledPolygon` values containing ordered turtle-space points and a fill color captured when the fill is completed.
+- `Turtle` will own fill state (`fillColor`, active/inactive status, and the in-progress path). `beginFill()` starts at the current position; `endFill()` publishes a polygon only when at least three points are available.
+- Fill recording remains headless. Movement with the pen up will contribute points to an active fill path but will not create `LineSegment` values.
 - `Turtle` is mutable with getters. `getSegments()` returns an unmodifiable view.
 - Heading is stored in degrees, normalised to `[0, 360)` after every `left`/`right` call. Conversion to radians happens only inside `forward` when computing trig.
 - Heading convention: 0° = east, increases counter-clockwise (standard math / Python turtle).
@@ -93,6 +110,7 @@ classDiagram
 - `Screen` is a façade around a Swing window: it owns a live `Turtle` reference, creates a `JFrame`, and adds a custom `TurtleCanvas` to the frame.
 - `Screen` is intentionally not a subclass of `JFrame`; it owns the frame as a separate object to avoid recursion and keep the API more explicit and testable.
 - `TurtleCanvas extends JPanel` and overrides `paintComponent` to iterate `turtle.getSegments()`. Each segment is painted using its stored `Color` and `width`.
+- For Epic 4, `TurtleCanvas` will render completed `FilledPolygon` values before line segments, mapping every vertex with the existing coordinate transform so the pen outline remains visible.
 - The render loop intentionally reads the live turtle state on each repaint, which keeps the screen synchronized with the turtle and supports Epic 4 animation without changing the screen API.
 
 ### Turtle coordinate system

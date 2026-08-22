@@ -1,16 +1,19 @@
 package turtle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 // Use assertEquals(expected, actual, 1e-9) for all floating-point position checks.
 class TestTurtle {
-    /* Default state (Story 1.1) */    
+    /* Default state (Story 1.1) */
    @Test
     void testTurtleDefaultState() {
         Turtle turtle = new Turtle();
@@ -26,7 +29,7 @@ class TestTurtle {
         assertEquals(0, turtle.getSegments().size());
     }
 
-    /* forward / backward (Story 1.2) */    
+    /* forward / backward (Story 1.2) */
     @Test
     void testForwardAndBackward() {
         Turtle turtle = new Turtle();
@@ -36,23 +39,23 @@ class TestTurtle {
         // forward with pen down → one segment added with correct from, to, color, width
         List<LineSegment> segments = turtle.getSegments();
         LineSegment expectedLineSegment = new LineSegment(
-            new Vector2D(0, 0), 
-            new Vector2D(100, 0), 
+            new Vector2D(0, 0),
+            new Vector2D(100, 0),
             Color.BLACK,
             1
         );
         assertEquals(expectedLineSegment, segments.get(0));
 
-        // Two consecutive forward calls → two segments, and from of second equals to of first 
+        // Two consecutive forward calls → two segments, and from of second equals to of first
         turtle.forward(100);
         LineSegment expectedLineSegment2 = new LineSegment(
-            new Vector2D(100, 0), 
-            new Vector2D(200, 0), 
+            new Vector2D(100, 0),
+            new Vector2D(200, 0),
             Color.BLACK,
             1
         );
         assertEquals(expectedLineSegment2, segments.get(1));
-        
+
         // forward and backward with pen up → no segment added
         turtle.penUp();
         turtle.forward(100);
@@ -86,18 +89,18 @@ class TestTurtle {
         yertle.left(90);
         // left(90) from 0 → heading 90
         yertle.left(90);
-        assertEquals(90, yertle.getHeading());        
+        assertEquals(90, yertle.getHeading());
         yertle.right(90);
         // right(90) then left(90) → back to original heading
         yertle.right(90);
         yertle.left(90);
-        assertEquals(0, yertle.getHeading());        
+        assertEquals(0, yertle.getHeading());
         // right(360) → heading unchanged (0)
         yertle.right(360);
-        assertEquals(0, yertle.getHeading());        
+        assertEquals(0, yertle.getHeading());
         // right(angle) with angle > 360 wraps correctly
         yertle.right(360 + 45);
-        assertEquals(360-45, yertle.getHeading(), 1e-9);                
+        assertEquals(360-45, yertle.getHeading(), 1e-9);
         // penUp / penDown (Story 1.4)
         yertle.penUp();
         assertEquals(false, yertle.getPen().isDown());
@@ -109,7 +112,7 @@ class TestTurtle {
         yertle.penDown();
         yertle.forward(100);
         assertEquals(1, yertle.getSegments().size());
-    }    
+    }
 
     // goTo / setHeading (Story 1.5)
     @Test
@@ -130,10 +133,10 @@ class TestTurtle {
         assertEquals(1, yertle.getSegments().size());
     }
 
-    /* Segment history (Story 1.6) */ 
+    /* Segment history (Story 1.6) */
     @Test
     void testSegmentHistory() {
-        Turtle yertle = new Turtle(); 
+        Turtle yertle = new Turtle();
         // Three forward calls with pen down → three segments in order
         yertle.forward(50);
         Vector2D from = new Vector2D(0, 0);
@@ -158,7 +161,7 @@ class TestTurtle {
         yertle.forward(100);
         yertle.penDown();
         yertle.forward(100);
-        assertEquals(4, yertle.getSegments().size());        
+        assertEquals(4, yertle.getSegments().size());
     }
 
     /* home (Story 1.7) */
@@ -184,4 +187,82 @@ class TestTurtle {
         LineSegment segment = new LineSegment(from, to, Color.BLACK, 1);
         assertEquals(segment, yertle.getSegments().get(0));
     }
+
+    /* Story 3.1: penColor(Color) on Turtle. The Pen already owns color state;
+       Turtle exposes the convenience forwarding method. */
+    @Test
+    void penColorChangesCurrentPenColor() {
+        Turtle yertle = new Turtle();
+        yertle.penColor(Color.RED);
+        assertEquals(Color.RED, yertle.getPen().getColor());
+    }
+
+    @Test
+    void movementRecordsCurrentPenColor() {
+        Turtle yertle = new Turtle();
+        yertle.penColor(Color.RED);
+        yertle.forward(100);
+        assertEquals(1, yertle.getSegments().size());
+        LineSegment segment = yertle.getSegments().get(0);
+        assertEquals(Color.RED, segment.getColor());
+    }
+
+    @Test
+    void changingPenColorAffectsSubsequentSegments() {
+        Turtle yertle = new Turtle();
+        yertle.penColor(Color.RED);
+        yertle.forward(100);
+
+        yertle.penColor(Color.BLUE);
+        yertle.forward(100);
+        assertEquals(2, yertle.getSegments().size());
+        LineSegment segment1 = yertle.getSegments().get(0);
+        assertEquals(Color.RED, segment1.getColor());
+
+        LineSegment segment2 = yertle.getSegments().get(1);
+        assertEquals(Color.BLUE, segment2.getColor());
+    }
+
+    /* Story 3.2: penWidth(width) on Turtle. The Pen already owns width state;
+       Turtle exposes the convenience forwarding method. */
+    @Test
+    void penWidthChangesCurrentPenWidth() {
+        Turtle yertle = new Turtle();
+        yertle.penWidth(5);
+        assertEquals(5, yertle.getPen().getWidth());
+    }
+
+    @Test
+    void movementRecordsCurrentPenWidth() {
+        Turtle yertle = new Turtle();
+        yertle.penWidth(5);
+        yertle.forward(100);
+        assertEquals(1, yertle.getSegments().size());
+        LineSegment segment = yertle.getSegments().get(0);
+        assertEquals(5, segment.getWidth());
+    }
+
+    @Test
+    void changingPenWidthAffectsSubsequentSegments() {
+        Turtle yertle = new Turtle();
+        yertle.penWidth(2);
+        yertle.forward(100);
+
+        yertle.penWidth(5);
+        yertle.forward(100);
+        assertEquals(2, yertle.getSegments().size());
+        LineSegment segment1 = yertle.getSegments().get(0);
+        assertEquals(2, segment1.getWidth());
+
+        LineSegment segment2 = yertle.getSegments().get(1);
+        assertEquals(5, segment2.getWidth());
+    }
+
+    @Test
+    void penWidth_zeroOrNegative_throws() {
+        Turtle yertle = new Turtle();
+        assertThrows(IllegalArgumentException.class, () -> yertle.penWidth(0));
+        assertThrows(IllegalArgumentException.class, () -> yertle.penWidth(-1));
+    }
+
 }

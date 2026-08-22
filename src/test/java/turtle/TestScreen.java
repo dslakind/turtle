@@ -37,7 +37,7 @@ class TestScreen{
                 screen.getFrame().dispose();
             }
         });
-    }    
+    }
 
     @Test
     void frameContainsTurtleCanvas() throws Exception {
@@ -57,7 +57,7 @@ class TestScreen{
                 frame.dispose();
             }
         });
-    }    
+    }
 
 @Test
 void frameIsConfiguredCorrectly() throws Exception {
@@ -90,7 +90,7 @@ void frameIsConfiguredCorrectly() throws Exception {
             Screen screen = new Screen(turtle);
 
             try {
-                assertFalse(screen.getFrame().isVisible());    
+                assertFalse(screen.getFrame().isVisible());
                 screen.show();
                 assertTrue(screen.getFrame().isVisible());
             } finally {
@@ -125,7 +125,7 @@ void frameIsConfiguredCorrectly() throws Exception {
         turtle.getPen().setWidth(1);
 
         turtle.forward(100);
-        
+
         turtle.left(90);
         turtle.getPen().setWidth(5);
         turtle.forward(100);
@@ -226,7 +226,7 @@ void frameIsConfiguredCorrectly() throws Exception {
 
         // Turtle (0, 100) -> Swing (400, 200)
         assertEquals(Color.BLACK.getRGB(), image.getRGB(400, 200));
-    }    
+    }
 
     private BufferedImage render(Turtle turtle) {
         return render(turtle, 600, 600);

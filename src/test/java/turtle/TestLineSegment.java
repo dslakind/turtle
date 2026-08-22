@@ -46,7 +46,7 @@ class TestLineSegment {
         assertNotEquals(segment2, segment4);
         assertNotEquals(segment2, segment5);
         assertNotEquals(segment2, null);
-        assertNotEquals(segment2, "foo");                
+        assertNotEquals(segment2, "foo");
     }
 
     @Test

@@ -25,5 +25,5 @@ public class TestTurtleCanvas {
 
         assertSame(turtle, canvas.getTurtle());
     }
-    
+
 }

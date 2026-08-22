@@ -12,13 +12,13 @@ class TestPen {
     void testDefaultPenState() {
         Pen pen = new Pen();
         assertEquals(new Pen(true, Color.BLACK,1), pen);
-    }    
+    }
 
     @Test
     void testPenUp() {
         Pen pen = new Pen();
         pen.penUp();
-        assertEquals(new Pen(false, Color.BLACK,1), pen);        
+        assertEquals(new Pen(false, Color.BLACK,1), pen);
     }
 
     @Test
@@ -26,7 +26,7 @@ class TestPen {
         Pen pen = new Pen();
         pen.penUp();
         pen.penDown();
-        assertEquals(new Pen(true, Color.BLACK,1), pen);        
+        assertEquals(new Pen(true, Color.BLACK,1), pen);
     }
 
     @Test
@@ -43,9 +43,10 @@ class TestPen {
         assertEquals(new Pen(true, Color.BLUE, 1), pen);
     }
 
-    @Test void setWidth_zeroOrNegative_throws() {
+    @Test
+    void setWidth_zeroOrNegative_throws() {
         Pen pen = new Pen();
         assertThrows(IllegalArgumentException.class, () -> pen.setWidth(0));
         assertThrows(IllegalArgumentException.class, () -> pen.setWidth(-1));
-    }    
+    }
 }

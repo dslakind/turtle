@@ -25,7 +25,7 @@ public class Screen{
         frame.setTitle("Turtle Graphics");
         frame.setSize(800, 600);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.add(canvas);        
+        frame.add(canvas);
     }
 
     /** Makes the screen window visible. */

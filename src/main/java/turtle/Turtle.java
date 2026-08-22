@@ -1,8 +1,10 @@
 package turtle;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /** Headless turtle state machine mirroring Python's {@code turtle} module; no GUI dependency. */
 public class Turtle {
@@ -57,7 +59,7 @@ public class Turtle {
                     position,
                     destination,
                     pen.getColor(),
-                    pen.getWidth() 
+                    pen.getWidth()
                 )
             );
         }
@@ -97,6 +99,31 @@ public class Turtle {
     /** Returns an unmodifiable view of all segments recorded since construction. */
     public List<LineSegment> getSegments() {
         return Collections.unmodifiableList(segments);
+    }
+
+    /**
+     * Changes the turtle's current pen color.
+     * The color applies to subsequently drawn segments; previously recorded
+     * segments retain their original colors.
+     *
+     * @param theColor color to use for subsequent segments
+     * @throws NullPointerException if {@code theColor} is null
+     */
+    public void penColor(Color theColor) {
+        pen.setColor(
+            Objects.requireNonNull(theColor)
+        );
+    }
+
+    /**
+     * Sets the width used for subsequently drawn segments.
+     * Previously recorded segments retain their original widths.
+     *
+     * @param theWidth positive stroke width
+     * @throws IllegalArgumentException if {@code theWidth} is zero or negative
+     */
+    public void penWidth(double theWidth) {
+        pen.setWidth(theWidth);
     }
 
     /** Sets heading directly in degrees. Does not normalise to [0, 360) unlike {@code left}/{@code right}. */

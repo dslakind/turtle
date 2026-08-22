@@ -8,7 +8,7 @@ public class Pen {
     private boolean isDown;
     private Color color;
     private double width;
-    
+
     /**
      * Creates a pen with the supplied state, color, and stroke width.
      *
@@ -19,7 +19,7 @@ public class Pen {
         color = initColor;
         width = initWidth;
     }
-    
+
     /** Defaults: pen down, black, width 1.0 — matches Python turtle defaults. */
     public Pen() {
         this(true, Color.BLACK, 1);
@@ -78,7 +78,7 @@ public class Pen {
         }
 
         Pen pen = (Pen) other;
-        return this.isDown == pen.isDown 
+        return this.isDown == pen.isDown
             && this.color.equals(pen.color)
             && this.width == pen.width;
     }

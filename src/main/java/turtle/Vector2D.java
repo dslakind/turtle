@@ -45,9 +45,9 @@ public class Vector2D {
         }
         if(this == other) {
             return true;
-        } 
+        }
         Vector2D obj = (Vector2D) other;
-        return this.x == obj.x 
+        return this.x == obj.x
                 && this.y == obj.y;
     }
 
@@ -60,6 +60,6 @@ public class Vector2D {
     public String toString() {
         return "Vector2D [x=" + x + ", y=" + y + "]";
     }
-    
-    
+
+
 }

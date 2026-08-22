@@ -15,9 +15,9 @@ public class LineSegment {
      * @throws IllegalArgumentException if width is zero or negative
      */
     public LineSegment(
-        Vector2D initFrom, 
+        Vector2D initFrom,
         Vector2D initTo,
-        Color initColor, 
+        Color initColor,
         double initWidth
     ) {
         Objects.requireNonNull(initFrom, "Vector2D from cannot be null");
@@ -68,7 +68,7 @@ public class LineSegment {
         }
 
         LineSegment obj = (LineSegment) other;
-        return this.from.equals(obj.getFrom()) 
+        return this.from.equals(obj.getFrom())
             && this.to.equals(obj.getTo())
             && this.width == obj.getWidth()
             && this.color.equals(obj.getColor());

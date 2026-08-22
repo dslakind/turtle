@@ -23,9 +23,9 @@ public class TurtleCanvas extends JPanel {
      */
     public TurtleCanvas(Turtle initTurtle) {
         turtle = Objects.requireNonNull(initTurtle);
-        
+
         setPreferredSize(new Dimension(600, 600));
-        setBackground(Color.WHITE);    
+        setBackground(Color.WHITE);
         setForeground(turtle.getPen().getColor());
     }
 
@@ -50,15 +50,15 @@ public class TurtleCanvas extends JPanel {
                 Vector2D to = segment.getTo();
 
                 int x1 = toScreenX(from.getX());
-                int y1 = toScreenY(from.getY());;
+                int y1 = toScreenY(from.getY());
                 int x2 = toScreenX(to.getX());
-                int y2 = toScreenY(to.getY());;
+                int y2 = toScreenY(to.getY());
 
                 g2d.setColor(segment.getColor());
                 g2d.setStroke(
-                    new BasicStroke((float) segment.getWidth())    
+                    new BasicStroke((float) segment.getWidth())
                 );
-                
+
                 g2d.drawLine(x1, y1, x2, y2);
             }
         } finally {
