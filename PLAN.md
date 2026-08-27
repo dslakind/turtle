@@ -10,6 +10,7 @@ A Java library that replicates the core motion & drawing behavior of Python's [`
 | Java version | 21 (LTS) |
 | Rendering | Java Swing / Java2D window |
 | Test framework | JUnit Jupiter 5.10.2 |
+| Coverage | JaCoCo 0.8.15; core library reported separately from graphical demo entry points |
 | Base package | `turtle` |
 | API scope (v1) | Core motion, pen styling, polygon fills, Swing rendering, and headless image tests |
 | Version control | Git, initialized locally |
@@ -52,7 +53,7 @@ Since there's no team to coordinate, we'll keep the ceremony lightweight but sti
 - **Definition of Done** for every story:
   1. Code implemented (by you, with my guidance/review — I won't write most of it).
   2. Unit tests written first or alongside (TDD where practical) and passing.
-  3. `mvn test` is green.
+3. `mvn verify` is green and refreshes the JaCoCo report.
   4. Public API has Javadoc.
   5. Quick self-review: does the behavior match the Python `turtle` equivalent (where applicable)?
 - **Sprint Review**: After each epic, we do a short walkthrough — run a demo script exercising the new feature.
@@ -256,7 +257,7 @@ immediately.
 - [x] Example programs (square, star, spiral) in `src/main/java` or a `examples`/`demo` module
 - [x] Review test coverage; fill gaps
 
-**Status:** Complete — a coverage-driven audit added 12 focused contract tests for constructor validation, defensive copies, unmodifiable histories, canvas defaults, and invalid animation progress. The audit also corrected the documented `Pen` constructor rule so zero and negative widths are rejected consistently. All 116 JUnit tests pass.
+**Status:** Complete — a coverage-driven audit added 12 focused contract tests for constructor validation, defensive copies, unmodifiable histories, canvas defaults, and invalid animation progress. The audit also corrected the documented `Pen` constructor rule so zero and negative widths are rejected consistently. All 118 JUnit tests pass. JaCoCo reports 98% instruction coverage and 90% branch coverage for the core library.
 
 ### Retrospective — Epic 6 (Polish & Documentation)
 
@@ -271,8 +272,25 @@ immediately.
 - Immutable value objects contain equality and validation branches that need direct contract tests rather than feature-level rendering tests.
 
 **What we would improve next time:**
-- Add JaCoCo reporting to Maven or CI and report core-library coverage separately from demo programs.
+- - Enforce the existing JaCoCo report in GitHub Actions and keep the coverage floors realistic as the public API grows.
 - Keep defensive-copy, validation, and collection-mutability assertions alongside each new public API from the start.
+
+---
+
+## Epic 7 — Release Preparation & CI
+**Goal:** Make the completed v1 library reproducible, automatically verified, documented, and ready for a tagged GitHub release.
+
+- [x] **Story 7.1** — Configure JaCoCo Maven reporting for the core library, excluding graphical demo entry points.
+- [ ] **Story 7.2** — Add a GitHub Actions workflow that runs `mvn verify` for pushes and pull requests.
+- [ ] **Story 7.3** — Enforce initial JaCoCo minimums of 95% instruction coverage and 85% branch coverage.
+- [ ] **Story 7.4** — Complete a final public-API and value-contract audit, including null handling, defensive copies, `equals`, and `hashCode`.
+- [ ] **Story 7.5** — Add a `CHANGELOG.md`, confirm the project license, and review release metadata.
+- [ ] **Story 7.6** — Generate and inspect Javadocs and the distributable JAR with a clean `mvn verify` build.
+- [ ] **Story 7.7** — Set the release version, tag the stable commit, and create a GitHub release with concise usage and verification notes.
+
+**Acceptance criteria:** GitHub automatically verifies every push and pull request; the build fails below the agreed coverage floors; release documentation and licensing are present; generated Javadocs and the JAR are inspected; and the release commit is tagged and published on GitHub.
+
+**Status:** Planned — JaCoCo reporting is configured and the current 118-test suite passes with 98% instruction coverage and 90% branch coverage for the core library. CI enforcement, release metadata, artifact inspection, versioning, and publication remain.
 
 ---
 
@@ -293,7 +311,7 @@ immediately.
 4. You implement; I review, point out issues, suggest but don't write the bulk of the solution.
 5. We run tests, check the box, move to the next story.
 
-**Next step:** Prepare the v1.0 release: run a final build, generate Javadocs, review release metadata, and tag the stable commit. Epics 0–6 are complete for their current scopes.
+**Next step:** Begin Epic 7 with Story 7.2: add GitHub Actions CI that runs `mvn verify` for every push and pull request.
 
 ## Retrospective
 
