@@ -224,14 +224,36 @@ playback. Speed `0` skips queue animation and displays the final model state
 immediately.
 
 - [x] **Story 5.1** — `speed(level)` setting (0 = instant, 1-10 = slow-to-fast).
-- [ ] **Story 5.2** — Incremental redraw/timer-based animation of movement (this is the trickiest part — likely needs its own design discussion on threading with Swing's EDT).
+- [x] **Story 5.2** — Incremental redraw/timer-based animation of movement using Swing's EDT.
+
+**Status:** Complete — `TurtleCanvas` owns a 16 ms Swing `Timer` and a visual movement cursor, replays recorded pen-down and pen-up movements in command order, and reveals speed-0 movement immediately. Animation, cursor, fill-timing, and speed behavior are covered by the green test suite (104 tests).
+
+## Retrospective — Epic 5 (Animation / Speed)
+
+**What worked well:**
+- Keeping model updates immediate while animation state lives in `TurtleCanvas` preserved the headless `Turtle` API and prevented rendering concerns from leaking into the model.
+- Recording every movement, including pen-up movement, let the visible turtle position animate correctly without creating unwanted line segments.
+- A movement index plus a fractional progress value provided one consistent cursor for lines, turtle position and heading, queued commands, and completed-fill visibility.
+- A Swing `Timer` kept animation ticks on the Event Dispatch Thread, and package-private animation hooks made the behavior deterministic in headless tests.
+- Speed `0` cleanly bypasses incremental playback while preserving the same final model state.
+
+**What was tricky:**
+- The movement list and line-segment list cannot share an index because pen-up movements are recorded but do not create segments.
+- Newly completed fills must stay hidden until the movement that completed them is fully visible; otherwise fills appear ahead of their animated outlines.
+- The visible turtle needs historical heading and interpolated position rather than the turtle's already-final model state.
+- Floating-point progress needs a completion tolerance so animation reliably advances to the next movement.
+
+**What we would improve next time:**
+- Replace the current linear speed-to-progress mapping with a documented duration or distance-based timing model if more Python-like pacing is needed.
+- Extract repeated rendering and animation setup into test helpers as the headless Swing suite grows.
+- Keep story checkboxes, status, and retrospectives current in the same commit that closes an epic.
 
 ---
 
 ## Epic 6 — Polish & Documentation
 - [x] Javadoc pass on all public API
 - [x] `README.md` with usage examples and rendering/fill semantics
-- [ ] Example programs (square, star, spiral) in `src/main/java` or a `examples`/`demo` module
+- [x] Example programs (square, star, spiral) in `src/main/java` or a `examples`/`demo` module
 - [ ] Review test coverage; fill gaps
 
 ---
@@ -253,9 +275,7 @@ immediately.
 4. You implement; I review, point out issues, suggest but don't write the bulk of the solution.
 5. We run tests, check the box, move to the next story.
 
-**Next step:** Start Epic 5 — Animation / Speed. Epics 0–4 are complete for
-their current scopes. The headless model and Swing renderer are implemented
-and tested; documentation is current through Story 4.5.
+**Next step:** Complete Epic 6 by reviewing test coverage and filling any remaining gaps. Epics 0–5 are complete for their current scopes; example programs, public API Javadocs, and README guidance are in place.
 
 ## Retrospective
 
