@@ -281,7 +281,7 @@ immediately.
 **Goal:** Make the completed v1 library reproducible, automatically verified, documented, and ready for a tagged GitHub release.
 
 - [x] **Story 7.1** — Configure JaCoCo Maven reporting for the core library, excluding graphical demo entry points.
-- [ ] **Story 7.2** — Add a GitHub Actions workflow that runs `mvn verify` for pushes and pull requests.
+- [x] **Story 7.2** — Add a GitHub Actions workflow that runs `mvn verify` for pushes and pull requests.
 - [ ] **Story 7.3** — Enforce initial JaCoCo minimums of 95% instruction coverage and 85% branch coverage.
 - [ ] **Story 7.4** — Complete a final public-API and value-contract audit, including null handling, defensive copies, `equals`, and `hashCode`.
 - [ ] **Story 7.5** — Add a `CHANGELOG.md`, confirm the project license, and review release metadata.
