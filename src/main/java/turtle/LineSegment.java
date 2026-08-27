@@ -3,7 +3,10 @@ package turtle;
 import java.awt.Color;
 import java.util.Objects;
 
-/** Immutable record of a drawn stroke; captures pen color and width at the time of drawing. */
+/**
+ * Immutable record of a drawn stroke in turtle-space coordinates.
+ * Captures pen color and width at the time of drawing.
+ */
 public class LineSegment {
     private final Vector2D from;
     private final Vector2D to;
@@ -11,7 +14,12 @@ public class LineSegment {
     private final double width;
 
     /**
-     * @throws NullPointerException if from, to, or color is null
+    * @param initFrom segment starting point
+    * @param initTo segment ending point
+    * @param initColor stroke color
+    * @param initWidth positive stroke width
+    * @throws NullPointerException if {@code initFrom}, {@code initTo}, or
+    *         {@code initColor} is null
      * @throws IllegalArgumentException if width is zero or negative
      */
     public LineSegment(
@@ -32,6 +40,15 @@ public class LineSegment {
         to = initTo;
         color = initColor;
         width = initWidth;
+    }
+
+    public LineSegment(LineSegment lineSegment) {
+        this(
+            lineSegment.from, 
+            lineSegment.to, 
+            lineSegment.color, 
+            lineSegment.width
+        );
     }
 
     /** Returns the segment's starting point. */

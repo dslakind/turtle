@@ -12,6 +12,9 @@ public class Pen {
     /**
      * Creates a pen with the supplied state, color, and stroke width.
      *
+    * @param isDown whether movement draws segments
+    * @param initColor current stroke color
+    * @param initWidth positive stroke width
      * @throws IllegalArgumentException if {@code initWidth} is zero or negative
      */
     public Pen(boolean isDown, Color initColor, double initWidth) {
@@ -23,6 +26,16 @@ public class Pen {
     /** Defaults: pen down, black, width 1.0 — matches Python turtle defaults. */
     public Pen() {
         this(true, Color.BLACK, 1);
+    }
+
+    /**
+     * Creates an independent copy of another pen's state.
+     *
+     * @param pen pen whose state is copied
+     * @throws NullPointerException if {@code pen} is null
+     */
+    public Pen(Pen pen) {
+        this(pen.isDown, pen.color, pen.width);
     }
 
     /** Lifts the pen so movement is not drawn. */
@@ -55,7 +68,12 @@ public class Pen {
         this.color = color;
     }
 
-    /** @throws IllegalArgumentException if width is zero or negative */
+    /**
+     * Sets the stroke width for subsequently recorded segments.
+     *
+     * @param width positive stroke width
+     * @throws IllegalArgumentException if {@code width} is zero or negative
+     */
     public void setWidth(double width) {
         if (width <= 0) {
             throw new IllegalArgumentException("Width must be positive:" + width);

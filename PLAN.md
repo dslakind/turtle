@@ -11,7 +11,7 @@ A Java library that replicates the core motion & drawing behavior of Python's [`
 | Rendering | Java Swing / Java2D window |
 | Test framework | JUnit Jupiter 5.10.2 |
 | Base package | `turtle` |
-| API scope (v1) | Core motion & drawing only (movement, heading, pen up/down, color, speed) |
+| API scope (v1) | Core motion, pen styling, polygon fills, Swing rendering, and headless image tests |
 | Version control | Git, initialized locally |
 | Turtle mutability | Mutable with getters (`getPosition`, `getHeading`, `getPen`, `getSegments`) |
 | Angle units | Degrees externally; converted to radians internally only for trig |
@@ -21,12 +21,26 @@ A Java library that replicates the core motion & drawing behavior of Python's [`
 | `LineSegment` mutability | Immutable — all fields `final`; captures pen color & width at draw time |
 | `forward(0)` behaviour | No-op — returns before computing position or recording a segment |
 | `forward` / `goTo` delegation | Public `goTo(double, double)` and `forward` both delegate to private `goTo(Vector2D)`; all segment-recording logic lives there |
+| `speed(level)` boundaries | Numeric values from `0.5` through below `10.5` are rounded to levels `1`–`10`; values below `0.5` or at/above `10.5` become `0` by project choice |
+| Animation model timing | Movement methods update the headless model and return immediately; Swing may still be visually animating the resulting movement |
+| Animation command ordering | New movement commands are accepted immediately and the renderer reveals recorded movements sequentially in command order |
+| Animation cursor ownership | The visible-segment index and progress along the active segment belong to Swing-side controller or canvas state, never to `Turtle` |
 | `setHeading` normalisation | Does **not** normalise to `[0, 360)` — only `left`/`right` normalise |
 | `home()` heading | Does **not** reset heading — only resets position to origin |
 | `Pen.setWidth` validation | Throws `IllegalArgumentException` for zero or negative values |
 | `Pen` value equality | Implements `equals`/`hashCode` (by `isDown`, `color`, `width`) to simplify test assertions |
-| `Screen` role | Pure renderer (Epic 2) — reads `Turtle.getSegments()` and paints; owns no turtle state |
-| `Screen` coupling | Holds a **live `Turtle` reference** — `paintComponent` calls `turtle.getSegments()` on each repaint; no snapshot passing. Enables animation (Epic 4) via a timer + `repaint()` with no API change. |
+| `Screen` role | Pure renderer — reads live turtle segments and completed polygons and paints; owns no turtle state |
+| `Screen` coupling | Holds a **live `Turtle` reference** — each repaint reads current segments and completed polygons; no snapshot passing. |
+
+### Rendering and fill semantics
+
+- Turtle space is Cartesian: `(0, 0)` is the canvas center, positive x points right, and positive y points up.
+- `TurtleCanvas` maps vertices with `screenX = width / 2 + x` and `screenY = height / 2 - y`, using actual component dimensions.
+- `beginFill()` starts a path at the current position. Every subsequent movement contributes a vertex, including pen-up movement.
+- `endFill()` is the point at which a path with at least three points becomes a completed `FilledPolygon`; its fill color is captured then.
+- `TurtleCanvas` fills completed polygons before drawing segment outlines, preserving visible outlines.
+- Headless tests render through `BufferedImage.TYPE_INT_RGB` and assert interior, exterior, outline, and coordinate-mapping pixels.
+- Self-intersecting polygons are subject to Java2D's fill rule. Python documents equivalent overlap behavior as graphics-system dependent, so a star's center is not required to fill uniformly.
 
 Out of scope for v1 (candidates for later epics): screen/window configuration (bgcolor, title, size), shapes/stamps, event handlers (onclick/onkey), multiple simultaneous turtles, undo/clone, text/write().
 
@@ -167,27 +181,56 @@ All 7 stories completed; `mvn test` green with 19 passing tests.
 ## Epic 4 — Shape Filling
 **Goal:** Record and render filled polygons while keeping fill state in the headless model and coordinate conversion in the renderer.
 
-- [ ] **Story 4.1** — `fillColor(color)` stores a fill color separately from the pen color.
-- [ ] **Story 4.2** — `beginFill()` starts recording a polygon path from the current turtle position.
-- [ ] **Story 4.3** — `endFill()` completes the path and publishes a filled polygon; filling does not render before completion.
-- [ ] **Story 4.4** — Canvas renders completed polygons before their outlines, using the stored fill color.
-- [ ] **Story 4.5** — Filled polygon coordinate mapping and headless `BufferedImage` rendering tests.
+- [x] **Story 4.1** — `fillColor(color)` stores a fill color separately from the pen color.
+- [x] **Story 4.2** — `beginFill()` starts recording a polygon path from the current turtle position.
+- [x] **Story 4.3** — `endFill()` completes the path and publishes a filled polygon; filling does not render before completion.
+- [x] **Story 4.4** — Canvas renders completed polygons before their outlines, using the stored fill color.
+- [x] **Story 4.5** — Filled polygon coordinate mapping and headless `BufferedImage` rendering tests.
 
 **Acceptance criteria:** A closed triangle or other polygon drawn between `beginFill()` and `endFill()` is rendered with the selected fill color, its outline remains visible, pen-up movement contributes to the fill path without creating a line segment, and incomplete or inactive fills do not create visible polygons. The model remains unit-testable without Swing.
 
 **Design boundary:** The model will expose immutable filled-polygon data containing ordered points and the fill color. The renderer will map each point with the existing turtle-to-Swing transform and draw completed polygons with `Graphics2D`. Nested fill calls and paths with fewer than three points must have explicit behavior in the implementation and tests.
 
+## Retrospective — Epic 4 (Shape Filling)
+
+**What worked well:**
+- Separating `FilledPolygon` from `LineSegment` kept fill geometry, fill color, and stroke styling independently testable.
+- Capturing polygon data at `endFill()` made completed fills immutable and preserved each polygon's color after later turtle state changes.
+- Rendering polygons before line segments kept outlines visible without introducing a second outline abstraction.
+- Headless `BufferedImage` tests validated actual pixels for fill color, background preservation, outline visibility, pen-up paths, and non-square canvases.
+- Checking the Python turtle documentation resolved an ambiguity in fill timing and aligned the implementation with the documented `begin_fill()`/`end_fill()` lifecycle.
+
+**What was tricky:**
+- Several initial assertions sampled pixels outside the polygons, which looked like rendering failures even though Java2D had painted the shapes correctly.
+- The five-point star exposed the platform-dependent behavior of self-intersecting polygon fills: its center is not guaranteed to fill uniformly.
+- A demo placement moved one polygon outside the image bounds, reinforcing that pixel tests must calculate screen coordinates from turtle coordinates before choosing sample points.
+
+**What we would improve next time:**
+- Choose test sample points from explicit polygon geometry and document their turtle-to-screen calculation beside each assertion.
+- Add a small reusable test helper for rendering and for asserting interior/background pixels without duplicating coordinate reasoning.
+- Decide explicitly whether future star or self-intersecting-shape APIs should preserve Java2D's fill rule or provide a custom fill policy.
+- Keep the plan, design notes, and retrospective updated in the same pass when an epic closes.
+
 ## Epic 5 — Animation / Speed
 **Goal:** Optional visual animation instead of instant line drawing, matching `speed()` in Python.
 
-- [ ] **Story 5.1** — `speed(level)` setting (0 = instant, 1-10 = slow-to-fast).
+Animation policy: `Turtle` updates final model state immediately and returns.
+The Swing renderer owns visual progress and reveals newly recorded movements
+in command order. The animation cursor, including the visible-segment index
+and progress along the active segment, belongs to Swing-side controller or
+canvas state and is not part of `Turtle`. Commands issued while earlier
+movements are animating are accepted immediately and queued for visual
+playback. Speed `0` skips queue animation and displays the final model state
+immediately.
+
+- [x] **Story 5.1** — `speed(level)` setting (0 = instant, 1-10 = slow-to-fast).
 - [ ] **Story 5.2** — Incremental redraw/timer-based animation of movement (this is the trickiest part — likely needs its own design discussion on threading with Swing's EDT).
 
 ---
 
 ## Epic 6 — Polish & Documentation
-- [ ] Javadoc pass on all public API
-- [ ] `README.md` with usage examples side-by-side with Python equivalents
+- [x] Javadoc pass on all public API
+- [x] `README.md` with usage examples and rendering/fill semantics
 - [ ] Example programs (square, star, spiral) in `src/main/java` or a `examples`/`demo` module
 - [ ] Review test coverage; fill gaps
 
@@ -210,7 +253,9 @@ All 7 stories completed; `mvn test` green with 19 passing tests.
 4. You implement; I review, point out issues, suggest but don't write the bulk of the solution.
 5. We run tests, check the box, move to the next story.
 
-**Next step:** Start Epic 4 — Shape Filling. Epics 0, 1, 2, and 3 are complete for their current scopes. The headless model and Swing renderer are implemented and tested. The design for `Screen` (a `JFrame` + custom `JPanel` that reads `Turtle.getSegments()` and paints via `Graphics2D`) is captured in `docs/design.md`, and the live `Turtle` reference design is recorded in the Decisions Log.
+**Next step:** Start Epic 5 — Animation / Speed. Epics 0–4 are complete for
+their current scopes. The headless model and Swing renderer are implemented
+and tested; documentation is current through Story 4.5.
 
 ## Retrospective
 

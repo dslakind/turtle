@@ -1,6 +1,9 @@
 # Design — v1 Class Diagram
 
-Epic 1 and Epic 2 classes are implemented and tested. Epic 3 adds pen styling. Epic 4 is planned as a separate shape-filling epic because it introduces polygon state and renderer behavior beyond individual line segments. The Swing rendering layer owns a live turtle reference, a `JFrame`, and a custom drawing `JPanel`.
+Epics 1–4 are implemented and tested. Epic 3 adds pen styling, and Epic 4
+adds completed polygon state plus renderer behavior beyond individual line
+segments. The Swing rendering layer owns a live turtle reference, a `JFrame`,
+and a custom drawing `JPanel`; the model itself remains usable without Swing.
 
 ```mermaid
 classDiagram
@@ -64,7 +67,7 @@ classDiagram
         -List~Vector2D~ points
         -Color color
         +getPoints() List~Vector2D~
-        +getColor() Color
+        +getFillColor() Color
     }
     class Screen {
         -Turtle turtle
@@ -90,7 +93,7 @@ classDiagram
     Screen "1" o-- "1" Turtle : renders live
     Screen "1" *-- "1" TurtleCanvas : owns
     Screen "1" *-- "1" JFrame : contains
-    TurtleCanvas "1" o-- "1" Turtle : reads segments
+    TurtleCanvas "1" o-- "1" Turtle : reads live drawing history
 ```
 
 ## Notes / Decisions
@@ -99,9 +102,9 @@ classDiagram
 - `Pen` is a separate object (not fields on `Turtle`) to mirror Python's `TPen` mixin and keep motion logic decoupled from drawing-style logic.
 - `Vector2D` is immutable — operations return new instances rather than mutating in place.
 - `LineSegment` is immutable — all fields are `final`; captures pen color and width at draw time.
-- Epic 4 will represent completed fills as immutable `FilledPolygon` values containing ordered turtle-space points and a fill color captured when the fill is completed.
-- `Turtle` will own fill state (`fillColor`, active/inactive status, and the in-progress path). `beginFill()` starts at the current position; `endFill()` publishes a polygon only when at least three points are available.
-- Fill recording remains headless. Movement with the pen up will contribute points to an active fill path but will not create `LineSegment` values.
+- Completed fills are immutable `FilledPolygon` values containing ordered turtle-space points and a fill color captured when the fill is completed.
+- `Turtle` owns fill state (`fillColor`, active/inactive status, and the in-progress path). `beginFill()` starts at the current position; `endFill()` publishes a polygon only when at least three points are available.
+- Fill recording remains headless. Movement with the pen up contributes points to an active fill path but does not create `LineSegment` values.
 - `Turtle` is mutable with getters. `getSegments()` returns an unmodifiable view.
 - Heading is stored in degrees, normalised to `[0, 360)` after every `left`/`right` call. Conversion to radians happens only inside `forward` when computing trig.
 - Heading convention: 0° = east, increases counter-clockwise (standard math / Python turtle).
@@ -109,9 +112,14 @@ classDiagram
 - `forward` delegates to a private `goTo(Vector2D)` overload; the public `goTo(double, double)` also delegates to it. All movement and segment-recording logic lives in one place.
 - `Screen` is a façade around a Swing window: it owns a live `Turtle` reference, creates a `JFrame`, and adds a custom `TurtleCanvas` to the frame.
 - `Screen` is intentionally not a subclass of `JFrame`; it owns the frame as a separate object to avoid recursion and keep the API more explicit and testable.
-- `TurtleCanvas extends JPanel` and overrides `paintComponent` to iterate `turtle.getSegments()`. Each segment is painted using its stored `Color` and `width`.
-- For Epic 4, `TurtleCanvas` will render completed `FilledPolygon` values before line segments, mapping every vertex with the existing coordinate transform so the pen outline remains visible.
-- The render loop intentionally reads the live turtle state on each repaint, which keeps the screen synchronized with the turtle and supports Epic 4 animation without changing the screen API.
+- `TurtleCanvas extends JPanel` and overrides `paintComponent` to render completed polygons before `turtle.getSegments()`. Each polygon uses its stored fill color; each segment uses its stored `Color` and `width`.
+- Polygon vertices use the existing coordinate transform, so line segments remain the visible outlines after filling.
+- The render loop intentionally reads the live turtle state on each repaint, keeping the screen synchronized with the turtle.
+- Animation is renderer-owned: movement methods update the headless model and return immediately, while Swing maintains separate visual progress.
+- The animation cursor, including the visible-segment index and progress along the active segment, belongs to a Swing-side controller or canvas state; it is never stored in `Turtle`.
+- Commands issued during animation are accepted immediately; the renderer reveals recorded movements sequentially in command order.
+- Speed `0` bypasses visual interpolation and displays the complete current model state immediately.
+- Self-intersecting polygons use Java2D's fill behavior. Python documents overlap regions as graphics-system dependent, so the center of a five-point star may remain the background color.
 
 ### Turtle coordinate system
 
@@ -126,4 +134,16 @@ Turtle coordinates use a Cartesian coordinate system:
   `screenX = canvasWidth / 2 + turtleX`
   `screenY = canvasHeight / 2 - turtleY`
 - The conversion uses the actual component dimensions, not only the preferred size.
-- This is the exact boundary for Story 2.3 and keeps the coordinate logic isolated in the canvas, not in the turtle model.
+- This coordinate boundary is shared by segment and polygon rendering and keeps mapping logic isolated in the canvas, not in the turtle model.
+
+### Headless rendering contract
+
+Tests can instantiate `TurtleCanvas`, set its size, paint into a
+`BufferedImage`, and inspect pixels without opening a `JFrame`. This validates
+fill color, background preservation, outline ordering, pen-up path behavior,
+positive/negative Y mapping, and non-square canvas dimensions.
+
+Animation tests should keep model assertions independent from wall-clock time:
+the model reaches its final position immediately, and only the Swing renderer's
+visual progress is time-dependent. A Swing `Timer` should advance that progress
+on the Event Dispatch Thread and reveal commands in recorded order.

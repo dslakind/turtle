@@ -13,7 +13,8 @@ public class Screen{
     /**
      * Creates a screen for {@code initTurtle} with an 800 by 600 window.
      *
-     * @param initTurtle turtle whose recorded segments are rendered
+    * @param initTurtle turtle whose recorded segments and completed polygons
+    *        are rendered through a live reference
      * @throws NullPointerException if {@code initTurtle} is null
      */
     public Screen(Turtle initTurtle) {

@@ -1,34 +1,49 @@
-package turtle;
+package turtle.demo;
 
 import java.awt.Color;
 import javax.swing.SwingUtilities;
 
+import turtle.Screen;
+import turtle.Turtle;
+
+/** Small manual demo showing filled shapes and their outlines. */
 public class TurtleDemo {
 
+    /** Launches the Swing demo on the event-dispatch thread. */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             Turtle turtle = new Turtle();
+            turtle.speed(1);
 
             // Move from the origin to the starting position for the square.
             moveWithoutDrawing(turtle, -250, 0);
 
-            turtle.getPen().setColor(Color.RED);
+            turtle.getPen().setColor(Color.BLUE);
             turtle.getPen().setWidth(3);
+            turtle.fillColor(Color.CYAN);
+            turtle.beginFill();
             drawSquare(turtle, 100);
+            turtle.endFill();
 
             // Move to the triangle.
             moveWithoutDrawing(turtle, 180, 0);
 
-            turtle.getPen().setColor(Color.BLUE);
+            turtle.getPen().setColor(Color.PINK);
             turtle.getPen().setWidth(3);
+            turtle.fillColor(Color.GREEN);
+            turtle.beginFill();
             drawTriangle(turtle, 120);
+            turtle.endFill();
 
             // Move to the star.
-            moveWithoutDrawing(turtle, 300, 50);
+            moveWithoutDrawing(turtle, 200, 50);
 
             turtle.getPen().setColor(Color.MAGENTA);
             turtle.getPen().setWidth(3);
-            drawFlower(turtle, 100);
+            turtle.fillColor(Color.PINK);
+            turtle.beginFill();
+            drawStar(turtle, 120);
+            turtle.endFill();
 
             Screen screen = new Screen(turtle);
             screen.show();
@@ -56,6 +71,13 @@ public class TurtleDemo {
         }
     }
 
+    /**
+     * Draws a flower made from thirty rotated five-point stars.
+     *
+     * @param turtle turtle to move and draw with
+     * @param sideLength length of each star edge
+     * @throws NullPointerException if {@code turtle} is null
+     */
     public static void drawFlower(Turtle turtle, double sideLength) {
         for (int pedal = 0; pedal < 360/10; pedal++) {
             int r = (int) (Math.random() * 256);
