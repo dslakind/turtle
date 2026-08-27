@@ -20,7 +20,7 @@ public class Pen {
     public Pen(boolean isDown, Color initColor, double initWidth) {
         this.isDown = isDown;
         color = initColor;
-        width = initWidth;
+        setWidth(initWidth);
     }
 
     /** Defaults: pen down, black, width 1.0 — matches Python turtle defaults. */

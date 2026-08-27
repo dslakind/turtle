@@ -8,7 +8,7 @@ history; Swing/Java2D renders that history in a window or a headless
 
 ## Status
 
-**Epics 1–5 are complete.** The current implementation includes:
+**Epics 1–6 are complete.** The current implementation includes:
 
 - Cartesian turtle movement and heading;
 - pen-up and pen-down movement;
@@ -20,8 +20,8 @@ history; Swing/Java2D renders that history in a window or a headless
 - headless model, rendering, fill, cursor, and animation tests; and
 - graphical example programs under `turtle.demo`.
 
-The full Maven suite currently contains 104 passing tests. Epic 6 is the
-remaining polish and test-coverage review. See [PLAN.md](PLAN.md) for the
+The full test suite currently contains 118 passing tests. The v1 roadmap is
+complete; the next milestone is release preparation. See [PLAN.md](PLAN.md) for the
 roadmap and [docs/design.md](docs/design.md) for the current architecture.
 
 ## Quick start
@@ -158,6 +158,16 @@ mvn package
 Most behavior is tested without opening a window. Rendering tests paint a
 `TurtleCanvas` into a `BufferedImage` and inspect pixels; tests that require
 a real `JFrame` are guarded for headless environments.
+### Coverage
+
+Run the full test suite and generate the JaCoCo report with:
+
+```bash
+mvn verify
+```
+
+Open `target/site/jacoco/index.html` in a browser to inspect line and branch coverage. The report measures the core `turtle` library and excludes graphical demo entry points under `turtle.demo`.
+
 
 ## Run the demos
 

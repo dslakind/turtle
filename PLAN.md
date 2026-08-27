@@ -254,7 +254,25 @@ immediately.
 - [x] Javadoc pass on all public API
 - [x] `README.md` with usage examples and rendering/fill semantics
 - [x] Example programs (square, star, spiral) in `src/main/java` or a `examples`/`demo` module
-- [ ] Review test coverage; fill gaps
+- [x] Review test coverage; fill gaps
+
+**Status:** Complete — a coverage-driven audit added 12 focused contract tests for constructor validation, defensive copies, unmodifiable histories, canvas defaults, and invalid animation progress. The audit also corrected the documented `Pen` constructor rule so zero and negative widths are rejected consistently. All 116 JUnit tests pass.
+
+### Retrospective — Epic 6 (Polish & Documentation)
+
+**What worked well:**
+- Reviewing coverage by behavior kept the work focused on public contracts and renderer invariants rather than an arbitrary percentage.
+- The existing headless rendering seams made it easy to verify animation and Swing behavior deterministically.
+- Contract tests exposed a real inconsistency between the `Pen` constructor, its setter, and its Javadocs.
+- Keeping demo entry points outside the coverage target avoided low-value tests that would only execute sample `main()` methods.
+
+**What was tricky:**
+- Aggregate coverage includes graphical demos, so the project-wide percentage understates core-library coverage.
+- Immutable value objects contain equality and validation branches that need direct contract tests rather than feature-level rendering tests.
+
+**What we would improve next time:**
+- Add JaCoCo reporting to Maven or CI and report core-library coverage separately from demo programs.
+- Keep defensive-copy, validation, and collection-mutability assertions alongside each new public API from the start.
 
 ---
 
@@ -275,7 +293,7 @@ immediately.
 4. You implement; I review, point out issues, suggest but don't write the bulk of the solution.
 5. We run tests, check the box, move to the next story.
 
-**Next step:** Complete Epic 6 by reviewing test coverage and filling any remaining gaps. Epics 0–5 are complete for their current scopes; example programs, public API Javadocs, and README guidance are in place.
+**Next step:** Prepare the v1.0 release: run a final build, generate Javadocs, review release metadata, and tag the stable commit. Epics 0–6 are complete for their current scopes.
 
 ## Retrospective
 

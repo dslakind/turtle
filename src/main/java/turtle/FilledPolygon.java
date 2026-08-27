@@ -82,6 +82,7 @@ public class FilledPolygon {
         int result = 1;
         result = prime * result + ((points == null) ? 0 : points.hashCode());
         result = prime * result + ((color == null) ? 0 : color.hashCode());
+        result = prime * result + completionMovementIndex;
         return result;
     }
 
@@ -104,11 +105,14 @@ public class FilledPolygon {
                 return false;
         } else if (!color.equals(other.color))
             return false;
+        if (completionMovementIndex != other.completionMovementIndex) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString() {
-        return "FilledPolygon [points=" + points + ", color=" + color + "]";
+        return "FilledPolygon [points=" + points + ", color=" + color + ", completionMovementIndex=" + completionMovementIndex + "]";
     }
 }
