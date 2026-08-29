@@ -1,6 +1,7 @@
 package turtle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -256,5 +257,171 @@ class TestContracts {
             NullPointerException.class,
             () -> new FilledPolygon(points, null, 0)
         );
+    }
+
+    @Test
+    void penRejectsNullColorsAndNonFiniteWidths() {
+        assertThrows(
+            NullPointerException.class,
+            () -> new Pen(true, null, 1)
+        );
+
+        Pen pen = new Pen();
+
+        assertThrows(
+            NullPointerException.class,
+            () -> pen.setColor(null)
+        );
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new Pen(true, Color.BLACK, Double.NaN)
+        );
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> pen.setWidth(Double.POSITIVE_INFINITY)
+        );
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> pen.setWidth(Double.NEGATIVE_INFINITY)
+        );
+    }
+
+    @Test
+    void lineSegmentRejectsInvalidCopyAndNonFiniteWidths() {
+        Vector2D from = new Vector2D(0, 0);
+        Vector2D to = new Vector2D(1, 1);
+
+        assertThrows(
+            NullPointerException.class,
+            () -> new LineSegment((LineSegment) null)
+        );
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new LineSegment(from, to, Color.BLACK, Double.NaN)
+        );
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new LineSegment(
+                from,
+                to,
+                Color.BLACK,
+                Double.POSITIVE_INFINITY
+            )
+        );
+    }
+
+    @Test
+    void movementHasCompleteValueAndValidationContracts() {
+        Movement movement = new Movement(
+            new Vector2D(0, 0),
+            new Vector2D(10, 5),
+            true,
+            45
+        );
+        Movement equalMovement = new Movement(
+            new Vector2D(0, 0),
+            new Vector2D(10, 5),
+            true,
+            45
+        );
+        Movement thirdEqualMovement = new Movement(
+            new Vector2D(0, 0),
+            new Vector2D(10, 5),
+            true,
+            45
+        );
+
+        assertEquals(movement, movement);
+        assertEquals(movement, equalMovement);
+        assertEquals(equalMovement, movement);
+        assertEquals(equalMovement, thirdEqualMovement);
+        assertEquals(movement, thirdEqualMovement);
+        assertEquals(movement.hashCode(), equalMovement.hashCode());
+
+        assertNotEquals(
+            movement,
+            new Movement(new Vector2D(1, 0), new Vector2D(10, 5), true, 45)
+        );
+        assertNotEquals(
+            movement,
+            new Movement(new Vector2D(0, 0), new Vector2D(11, 5), true, 45)
+        );
+        assertNotEquals(
+            movement,
+            new Movement(new Vector2D(0, 0), new Vector2D(10, 5), false, 45)
+        );
+        assertNotEquals(
+            movement,
+            new Movement(new Vector2D(0, 0), new Vector2D(10, 5), true, 90)
+        );
+        assertNotEquals(movement, null);
+        assertNotEquals(movement, "not a movement");
+
+        assertThrows(
+            NullPointerException.class,
+            () -> new Movement(null, new Vector2D(1, 1), true, 0)
+        );
+        assertThrows(
+            NullPointerException.class,
+            () -> new Movement(new Vector2D(0, 0), null, true, 0)
+        );
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new Movement(
+                new Vector2D(0, 0),
+                new Vector2D(1, 1),
+                true,
+                Double.NaN
+            )
+        );
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new Movement(
+                new Vector2D(0, 0),
+                new Vector2D(1, 1),
+                true,
+                Double.POSITIVE_INFINITY
+            )
+        );
+    }
+
+    @Test
+    void vectorEqualityAndNullContractsCoverDoubleEdgeCases() {
+        Vector2D positiveZero = new Vector2D(0.0, 0.0);
+        Vector2D negativeZero = new Vector2D(-0.0, 0.0);
+        Vector2D firstNaN = new Vector2D(Double.NaN, 1);
+        Vector2D secondNaN = new Vector2D(Double.NaN, 1);
+
+        assertNotEquals(positiveZero, negativeZero);
+        assertEquals(firstNaN, secondNaN);
+        assertEquals(firstNaN.hashCode(), secondNaN.hashCode());
+        assertThrows(NullPointerException.class, () -> positiveZero.add(null));
+        assertThrows(
+            NullPointerException.class,
+            () -> positiveZero.distanceTo(null)
+        );
+    }
+
+    @Test
+    void turtleHistoryGettersRemainUnmodifiableLiveViews() {
+        Turtle turtle = new Turtle();
+        List<LineSegment> segments = turtle.getSegments();
+        List<FilledPolygon> polygons = turtle.getFilledPolygons();
+
+        turtle.forward(10);
+
+        assertEquals(1, segments.size());
+        assertThrows(UnsupportedOperationException.class, segments::clear);
+
+        turtle.beginFill();
+        turtle.forward(10);
+        turtle.left(120);
+        turtle.forward(10);
+        turtle.left(120);
+        turtle.forward(10);
+        turtle.endFill();
+
+        assertEquals(1, polygons.size());
+        assertThrows(UnsupportedOperationException.class, polygons::clear);
     }
 }

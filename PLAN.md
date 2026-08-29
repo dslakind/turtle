@@ -282,15 +282,15 @@ immediately.
 
 - [x] **Story 7.1** — Configure JaCoCo Maven reporting for the core library, excluding graphical demo entry points.
 - [x] **Story 7.2** — Add a GitHub Actions workflow that runs `mvn verify` for pushes and pull requests.
-- [ ] **Story 7.3** — Enforce initial JaCoCo minimums of 95% instruction coverage and 85% branch coverage.
-- [ ] **Story 7.4** — Complete a final public-API and value-contract audit, including null handling, defensive copies, `equals`, and `hashCode`.
-- [ ] **Story 7.5** — Add a `CHANGELOG.md`, confirm the project license, and review release metadata.
+- [x] **Story 7.3** — Enforce initial JaCoCo minimums of 95% instruction coverage and 85% branch coverage.
+- [x] **Story 7.4** — Complete a final public-API and value-contract audit, including null handling, defensive copies, `equals`, and `hashCode`.
+- [x] **Story 7.5** — Add a `CHANGELOG.md`, confirm the project license, and review release metadata.
 - [ ] **Story 7.6** — Generate and inspect Javadocs and the distributable JAR with a clean `mvn verify` build.
 - [ ] **Story 7.7** — Set the release version, tag the stable commit, and create a GitHub release with concise usage and verification notes.
 
 **Acceptance criteria:** GitHub automatically verifies every push and pull request; the build fails below the agreed coverage floors; release documentation and licensing are present; generated Javadocs and the JAR are inspected; and the release commit is tagged and published on GitHub.
 
-**Status:** Planned — JaCoCo reporting is configured and the current 118-test suite passes with 98% instruction coverage and 90% branch coverage for the core library. CI enforcement, release metadata, artifact inspection, versioning, and publication remain.
+**Status:** Stories 7.1–7.5 are complete. The current 123-test suite passes locally. The project now has an MIT license, an unreleased changelog, and complete Maven release metadata. Artifact/Javadoc inspection, release versioning, and publication remain.
 
 ---
 
@@ -311,7 +311,7 @@ immediately.
 4. You implement; I review, point out issues, suggest but don't write the bulk of the solution.
 5. We run tests, check the box, move to the next story.
 
-**Next step:** Begin Epic 7 with Story 7.2: add GitHub Actions CI that runs `mvn verify` for every push and pull request.
+**Next step:** Begin Story 7.6: generate and inspect Javadocs and the distributable JAR with a clean `mvn verify` build.
 
 ## Retrospective
 

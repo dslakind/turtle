@@ -4,10 +4,41 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>turtle</groupId>
+  <groupId>io.github.dslakind</groupId>
   <artifactId>turtle</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
+
+  <name>Java Turtle Graphics Library</name>
+  <description>A Java 21 turtle graphics library with a headless model and Swing/Java2D rendering.</description>
+  <url>https://github.com/dslakind/turtle</url>
+  <inceptionYear>2026</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/license/mit</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>David Lakind</name>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/dslakind/turtle.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/dslakind/turtle.git</developerConnection>
+    <url>https://github.com/dslakind/turtle</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/dslakind/turtle/issues</url>
+  </issueManagement>
 
   <properties>
     <maven.compiler.source>21</maven.compiler.source>

@@ -20,7 +20,7 @@ public class LineSegment {
     * @param initWidth positive stroke width
     * @throws NullPointerException if {@code initFrom}, {@code initTo}, or
     *         {@code initColor} is null
-     * @throws IllegalArgumentException if width is zero or negative
+     * @throws IllegalArgumentException if width is not finite, zero, or negative
      */
     public LineSegment(
         Vector2D initFrom,
@@ -32,7 +32,7 @@ public class LineSegment {
         Objects.requireNonNull(initTo, "Vector2D to cannot be null");
         Objects.requireNonNull(initColor, "Color cannot be null");
 
-        if(initWidth <= 0) {
+        if (!Double.isFinite(initWidth) || initWidth <= 0) {
             throw new IllegalArgumentException("Line Segment width must be positive: " + initWidth);
         }
 
@@ -42,6 +42,12 @@ public class LineSegment {
         width = initWidth;
     }
 
+    /**
+     * Creates an independent copy of another line segment.
+     *
+     * @param lineSegment segment whose values are copied
+     * @throws NullPointerException if {@code lineSegment} is null
+     */
     public LineSegment(LineSegment lineSegment) {
         this(
             lineSegment.from, 
@@ -87,7 +93,7 @@ public class LineSegment {
         LineSegment obj = (LineSegment) other;
         return this.from.equals(obj.getFrom())
             && this.to.equals(obj.getTo())
-            && this.width == obj.getWidth()
+            && Double.compare(this.width, obj.getWidth()) == 0
             && this.color.equals(obj.getColor());
     }
 

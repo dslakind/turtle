@@ -20,9 +20,7 @@ history; Swing/Java2D renders that history in a window or a headless
 - headless model, rendering, fill, cursor, and animation tests; and
 - graphical example programs under `turtle.demo`.
 
-The full test suite currently contains 118 passing tests. The v1 roadmap is
-complete; the next milestone is release preparation. See [PLAN.md](PLAN.md) for the
-roadmap and [docs/design.md](docs/design.md) for the current architecture.
+The full Maven test suite currently contains 123 passing tests, and JaCoCo enforces minimums of 95% instruction coverage and 85% branch coverage for the core library. The implementation roadmap is complete; release preparation is in progress. See [PLAN.md](PLAN.md) for the roadmap, [CHANGELOG.md](CHANGELOG.md) for release history, and [docs/design.md](docs/design.md) for the current architecture.
 
 ## Quick start
 
@@ -201,5 +199,11 @@ src/main/java/turtle/        core library source
 src/main/java/turtle/demo/   graphical example programs
 src/test/java/turtle/        JUnit tests
 docs/design.md               architecture and rendering contracts
+CHANGELOG.md                 release history
+LICENSE                      MIT license
 PLAN.md                      roadmap and retrospectives
 ```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

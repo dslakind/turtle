@@ -1,5 +1,7 @@
 package turtle;
 
+import java.util.Objects;
+
 /**
  * Represents one recorded movement of a {@link Turtle}.
  *
@@ -31,6 +33,8 @@ public class Movement {
      * @param initTo ending position of the movement
      * @param initPenDown whether the pen was down during the movement
      * @param initHeading turtle heading, in degrees, during the movement
+     * @throws NullPointerException if {@code initFrom} or {@code initTo} is null
+     * @throws IllegalArgumentException if {@code initHeading} is not finite
      */
     public Movement(
         Vector2D initFrom,
@@ -38,8 +42,11 @@ public class Movement {
         boolean initPenDown,
         double initHeading
     ) {
-        from = new Vector2D(initFrom);
-        to = new Vector2D(initTo);
+        from = new Vector2D(Objects.requireNonNull(initFrom, "Movement start cannot be null"));
+        to = new Vector2D(Objects.requireNonNull(initTo, "Movement end cannot be null"));
+        if (!Double.isFinite(initHeading)) {
+            throw new IllegalArgumentException("Movement heading must be finite: " + initHeading);
+        }
         penDown = initPenDown;
         heading = initHeading;
     }
@@ -85,5 +92,26 @@ public class Movement {
      */
     public double getHeading() {
         return heading;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        Movement movement = (Movement) other;
+        return penDown == movement.penDown
+            && Double.compare(heading, movement.heading) == 0
+            && from.equals(movement.from)
+            && to.equals(movement.to);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(from, to, penDown, heading);
     }
 }

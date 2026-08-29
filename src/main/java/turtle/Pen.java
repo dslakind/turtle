@@ -15,11 +15,12 @@ public class Pen {
     * @param isDown whether movement draws segments
     * @param initColor current stroke color
     * @param initWidth positive stroke width
-     * @throws IllegalArgumentException if {@code initWidth} is zero or negative
+     * @throws NullPointerException if {@code initColor} is null
+     * @throws IllegalArgumentException if {@code initWidth} is not finite, zero, or negative
      */
     public Pen(boolean isDown, Color initColor, double initWidth) {
         this.isDown = isDown;
-        color = initColor;
+        color = Objects.requireNonNull(initColor, "Pen color cannot be null");
         setWidth(initWidth);
     }
 
@@ -63,19 +64,24 @@ public class Pen {
         return width;
     }
 
-    /** Sets the color used for subsequently recorded segments. */
+    /**
+     * Sets the color used for subsequently recorded segments.
+     *
+     * @param color new stroke color
+     * @throws NullPointerException if {@code color} is null
+     */
     public void setColor(Color color) {
-        this.color = color;
+        this.color = Objects.requireNonNull(color, "Pen color cannot be null");
     }
 
     /**
      * Sets the stroke width for subsequently recorded segments.
      *
      * @param width positive stroke width
-     * @throws IllegalArgumentException if {@code width} is zero or negative
+     * @throws IllegalArgumentException if {@code width} is not finite, zero, or negative
      */
     public void setWidth(double width) {
-        if (width <= 0) {
+        if (!Double.isFinite(width) || width <= 0) {
             throw new IllegalArgumentException("Width must be positive:" + width);
         }
 

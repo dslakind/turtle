@@ -92,8 +92,8 @@ public class Vector2D {
 
         Vector2D obj = (Vector2D) other;
 
-        return this.x == obj.x
-                && this.y == obj.y;
+        return Double.compare(this.x, obj.x) == 0
+                && Double.compare(this.y, obj.y) == 0;
     }
 
     @Override
@@ -104,5 +104,6 @@ public class Vector2D {
     @Override
     public String toString() {
         return "Vector2D [x=" + x + ", y=" + y + "]";
+
     }
 }
