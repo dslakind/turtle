@@ -286,11 +286,11 @@ immediately.
 - [x] **Story 7.4** — Complete a final public-API and value-contract audit, including null handling, defensive copies, `equals`, and `hashCode`.
 - [x] **Story 7.5** — Add a `CHANGELOG.md`, confirm the project license, and review release metadata.
 - [x] **Story 7.6** — Generate and inspect Javadocs and the distributable JAR with a clean `mvn verify` build.
-- [ ] **Story 7.7** — Set the release version, tag the stable commit, and create a GitHub release with concise usage and verification notes.
+- [x] **Story 7.7** — Set the release version, tag the stable commit, and create a GitHub release with concise usage and verification notes.
 
 **Acceptance criteria:** GitHub automatically verifies every push and pull request; the build fails below the agreed coverage floors; release documentation and licensing are present; generated Javadocs and the JAR are inspected; and the release commit is tagged and published on GitHub.
 
-**Status:** Stories 7.1–7.6 are complete. A clean Maven verification build passes all 123 tests and coverage checks. The distributable JAR, packaged Javadocs, and browsable API documentation were generated and inspected. Release versioning and publication remain.
+**Status:** Epic 7 is complete. Version 0.1.0 passes all 123 tests and coverage checks, includes verified binary and Javadoc artifacts, and is tagged as v0.1.0 and published on GitHub.
 
 ---
 
@@ -311,7 +311,7 @@ immediately.
 4. You implement; I review, point out issues, suggest but don't write the bulk of the solution.
 5. We run tests, check the box, move to the next story.
 
-**Next step:** Begin Story 7.7: set the release version, tag the stable commit, and create the GitHub release with concise usage and verification notes.
+**Next step:** Review the post-v1 backlog and choose the first stretch epic for the next development cycle.
 
 ## Retrospective
 

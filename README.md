@@ -176,8 +176,8 @@ mvn clean verify
 
 The build generates:
 
-- `target/turtle-0.1.0-SNAPSHOT.jar` — distributable library JAR
-- `target/turtle-0.1.0-SNAPSHOT-javadoc.jar` — packaged API documentation
+- `target/turtle-0.1.0.jar` — distributable library JAR
+- `target/turtle-0.1.0-javadoc.jar` — packaged API documentation
 - `target/reports/apidocs/index.html` — browsable API documentation
 
 

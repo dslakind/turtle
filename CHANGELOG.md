@@ -8,6 +8,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-08-29
+
 ### Added
 
 - A Java 21 turtle state model with movement, heading, pen, fill, and speed APIs.
@@ -26,3 +28,6 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 - Kept `Vector2D`, `LineSegment`, `Movement`, `Pen`, and `FilledPolygon` equality and validation contracts internally consistent.
 - Ensured completed fills remain hidden until their completing movement is visible during animation.
+
+[Unreleased]: https://github.com/dslakind/turtle/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/dslakind/turtle/releases/tag/v0.1.0
