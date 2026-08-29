@@ -166,6 +166,20 @@ mvn verify
 
 Open `target/site/jacoco/index.html` in a browser to inspect line and branch coverage. The report measures the core `turtle` library and excludes graphical demo entry points under `turtle.demo`.
 
+### Release artifacts
+
+Run a clean verification build before inspecting release artifacts:
+
+```bash
+mvn clean verify
+```
+
+The build generates:
+
+- `target/turtle-0.1.0-SNAPSHOT.jar` — distributable library JAR
+- `target/turtle-0.1.0-SNAPSHOT-javadoc.jar` — packaged API documentation
+- `target/reports/apidocs/index.html` — browsable API documentation
+
 
 ## Run the demos
 
